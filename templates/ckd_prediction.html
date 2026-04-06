@@ -1,0 +1,174 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <title>CKD Prediction System</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #4facfe, #00f2fe);
+    }
+
+    .container {
+        width: 60%;
+        margin: 50px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+
+    form {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    input, select {
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        width: 100%;
+    }
+
+    button {
+        grid-column: span 2;
+        padding: 12px;
+        background: #4facfe;
+        border: none;
+        color: white;
+        font-size: 16px;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #007bff;
+    }
+
+    .result-card {
+    width: 60%;
+    margin: 30px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0px 5px 20px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.box {
+    padding: 15px;
+    margin: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    color: white;
+}
+
+.healthy {
+    background: #28a745;
+}
+
+.mild_ckd {
+    background: #ffc107;
+    color: black;
+}
+
+.severe_ckd {
+    background: #dc3545;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Chronic Kidney Disease Prediction</h1>
+    <form method="post">
+    {% csrf_token %}
+
+    <input type="number" name="Age" placeholder="Age" required>
+    <input type="number" name="BMI" placeholder="BMI" required>
+
+    <input type="number" name="Systolic_BP" placeholder="Systolic BP" required>
+    <input type="number" name="Diastolic_BP" placeholder="Diastolic BP" required>
+
+    <input type="number" name="Heart_Rate" placeholder="Heart Rate" required>
+    <input type="number" name="Sodium" placeholder="Sodium" required>
+
+    <input type="number" name="Potassium" placeholder="Potassium" required>
+    <input type="number" name="Hemoglobin" placeholder="Hemoglobin" required>
+
+    <select name="Gender">
+        <option value="" disabled selected>Select Gender</option>
+        <option value="1">Male</option>
+        <option value="0">Female</option>
+    </select>
+
+    <select name="Diabetes">
+        <option value="" disabled selected>Select Diabetes</option>
+        <option value="1">Yes</option>
+        <option value="0">No</option>
+    </select>
+
+    <select name="Hypertension">
+            <option value="" disabled selected> Select Hypertension</option>
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+    </select>
+
+    <select name="Smoking_Status">
+        <option value="" disabled selected>Select Smoking Status</option>
+        <option value="1">Yes</option>
+        <option value="0">No</option>
+    </select>
+
+    <button type="submit" name="buttonadd">Predict</button>
+    
+</form>
+
+{% if show_result %}
+
+<div class="result-card">
+
+    <h2>Prediction Result</h2>
+
+<div class="box {% if dt_result == 'Healthy Kidney' %}healthy{% elif dt_result == 'Mild CKD' %}mild_ckd{% elif dt_result == 'Moderate CKD' %}mild_ckd{% else %}severe_ckd{% endif %}">        <h3>Decision Tree</h3>
+        <p>{{ dt_result }}</p>
+    </div>
+
+    <div class="box {% if rf_result == 'Healthy Kidney' %}healthy{% elif rf_result == 'Mild CKD' %}mild_ckd{% elif rf_result == 'Moderate CKD' %}mild_ckd{% else %}severe_ckd{% endif %}">
+        <h3>Random Forest</h3>
+        <p>{{ rf_result }}</p>
+    </div>
+
+    <div class="box {% if lr_result == 'Healthy Kidney' %}healthy{% elif lr_result == 'Mild CKD' %}mild_ckd{% elif lr_result == 'Moderate CKD' %}mild_ckd{% else %}severe_ckd{% endif %}">
+        <h3>Logistic Regression</h3>
+        <p>{{ lr_result }}</p>
+    </div>
+    <p>Decision Tree Accuracy: {{ dt_acc }}%</p>
+<p>Random Forest Accuracy: {{ rf_acc }}%</p>
+<p>Logistic Regression Accuracy: {{ lr_acc }}%</p>
+
+    <hr>
+
+    <h3>Best Model: {{ best_model }}</h3>
+
+</div>
+
+{% endif %}
+
+
+</div>
+
+</body>
+{% endblock %}
